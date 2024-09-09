@@ -63,13 +63,14 @@ if [[ -d "${_brew_opt}/go" ]]; then
 fi
 export PATH
 
-#  Racket
-# export PLTUSERHOME="${XDG_CONFIG_HOME}/racket"
-# export PLTADDONDIR="${XDG_DATA_HOME}/racket"
+#  Racket (no environ used)
 
 #  ocaml
 export OPAMROOT="$XDG_DATA_HOME/opam"
 
+### Tools config environment
+# fzf
+export FZF_DEFAULT_OPTS="--height 40% --border"
 
 ### other tools environ for XDG]
 # wget
