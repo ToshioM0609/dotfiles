@@ -79,6 +79,9 @@
 	name = Furukawa Atsushi
 	email = atsushifx@gmail.com
 
+[aliases]
+
+
 [alias]
 	ss = status -s
 	br = branch
@@ -96,6 +99,7 @@
 	l = log --graph --all --pretty=format:'%C(yellow)%h%C(cyan)%d%Creset %s %C(white)- %an, %ar%Creset'
 	ll = log --stat --abbrev-commit
 	lg = log --color --graph --pretty=format:'%C(bold white)%h%Creset -%C(bold green)%d%Creset %s %C(bold green)(%cr)%Creset %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+aliases = !git config --get-regexp '^alias\\.' | sed 's/alias\\.\\([^ ]*\\) \\(.*\\)/\\1\\\t => \\2/' | sort
 
 [filter "lfs"]
 	required = true
