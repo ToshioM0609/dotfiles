@@ -3,13 +3,13 @@
 command line editing functions library
 
 .DESCRIPTION
- command line function library for powershell.
+command line function library for powershell.
 
 .NOTES
 @Author		Furukawa, Atsushi <atsushifx@aglabo.com>
 @License 	MIT License https://opensource.org/licenses/MIT
 
-@date		2023-05-31
+@date			2023-05-31
 @Version 	1.1.0
 
 THIS CODE IS MADE AVAILABLE AS IS, WITHOUT WARRANTY OF ANY KIND.
@@ -17,24 +17,43 @@ THE ENTIRE RISK OF THE USE OR THE RESULTS FROM THE USE OF THIS CODE REMAINS WITH
 #>
 Set-StrictMode -version latest
 
+###
+###		Functions
+###
+
 <#
 .SYNOPSIS
-Retrieves the global command history from the PowerShell history file.
+	Retrieves the global command history from the PowerShell history file.
 
 .DESCRIPTION
-Read PSReadLine''s command history files as global history. and remove clear line and duplicate entries
+	The `Get-Global-History` function reads the command history from PSReadLine's history file,
+	removes any empty lines and duplicate entries, and returns the cleaned global command history.
+	You can optionally specify the number of entries to retrieve from the beginning or the end of the history.
 
-.PARAMETER none
-This function does not take any parameters.
+.PARAMETER Head
+	An integer specifying the number of entries to retrieve from the beginning of the history.
+
+.PARAMETER Tail
+	An integer specifying the number of entries to retrieve from the end of the history.
+
+.EXAMPLE
+  Get-Global-History -Tail 20
+
+	Retrieves the last 20 commands from the global history.
 
 .NOTES
-The function uses PSReadLine to access the persistent command history file.
+	Requires:
+	- PowerShell 5.0 or later
+	- PSReadLine module
+	
+	Description:
+		This function accesses the persistent command history file used by PSReadLine,
 #>
 function global:Get-Global-History() {
- param(
+	param(
 		[int]$Head,
 		[int]$Tail
- )
+	)
 	## main routin
 	begin {
 		$globalHistoryCommand = '(Get-Content -Path (Get-PSReadLineOption).HistorySavePath)'
@@ -60,21 +79,24 @@ Set-Alias -Name ggh -Value global:Get-Global-History -Description { "get global 
 
 <#
 .SYNOPSIS
-execute command
+Executes a command with optional history management and command line editing.
 
 .DESCRIPTION
-execute command wrapper for history
-if -send (equal call from command line editing)
-emulate edit command line for execute command
+The `Execute_Command` function execute commands as instead of Invoke-Expression
+"-Send" switch is execute command as cli input.
+"-Enter" switch is send enter after command input for execute command.
 
 .PARAMETER command
+execute command string
 
 .PARAMETER send
+sends the command to the command line editor instead of executing it immediately.
 
 .PARAMETER Enter
+use with "-Send", this switch send "Enter" to execute command.
 
 .NOTES
-
+This script provides a convenient way to execute commands with enhanced control over command history and editing.
 #>
 function global:Execute_Command() {
 	param(
@@ -87,29 +109,36 @@ function global:Execute_Command() {
 		# execute command with readline function
 		[Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
 		[Microsoft.PowerShell.PSConsoleReadLine]::Insert($command)
-	[Microsoft.PowerShell.PSConsoleReadLine]::InvokePrompt()
+		[Microsoft.PowerShell.PSConsoleReadLine]::InvokePrompt()
 		
 		if ($Enter) {
 			[Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
 		}
 	}
- else {
+	else {
 		Invoke-Expression($command)
 	}
 }
 
 <#
-	.SYNOPSIS
-	select command line using peco and execute it.
-	caution: for execute this function, you must install tac, peco
+.SYNOPSIS
+	Selects a command from history using fzf and edit or executes it.
 
-	.DESCRIPTION
-	display history and select using tac & peco
-	then select, execute it.
-	use -send switch, this function execute command like key input.
+.DESCRIPTION
+	The `Execute_History` function displays the command history from newest to oldest.
+	It allows you to select a command using `fzf`. You can choose to execute the selected
+	command immediately or insert it into the command line for editing before execution
+	by using the `-Send` switch.
+	
+.PARAMETER Send
+	true: select command is inserted in to command line to edit before execute it.
 
-	.NOTES
-	using this function, you must install peco, busybox/coreutils
+.NOTES
+	Requires:
+  - PowerShell 5.0 or later
+	- `tac` (from BusyBox or CoreUtils)
+	- `fzf` (fuzzy finder) installed and available in the system PATH
+
 #>
 function Execute_History() {
 	param(
@@ -124,28 +153,36 @@ function Execute_History() {
 		[Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
 	}
 }
-
 Set-Alias -Name hh -Value "Execute_History"
 
 <#
-	.SYNOPSIS
+.SYNOPSIS
 	Get Process Object of Parent Process called by ProcessID
 
-	.DESCRIPTION
+.DESCRIPTION
+	The `Get-ParentProcessId` function find Parent Process ID (PPID) using WMI.
+	
+.PARAMETER ProcessId
+	The Process ID (PID) of the child process
+	
+.EXAMPLE
+	Get-ParentProcessId $PID
 
+	the PPID from $PID (=powershell) is Windows Terminal's ID
 
-	.PARAMETER ProcessId
-	Child Process ID: Get Parent Process from this ID
+.NOTES
+	Requirements:
+		- Appropriate permissions to perform WMI queries.
+		- WMI must be enabled and accessible on the system.
+	
+	Caution:
+		- Some security software may block WMI queries, which can prevent this function from working properly.
 
+.LINK
+	- [Get-Process](https://docs.microsoft.com/powershell/module/microsoft.powershell.management/get-process)
+  - [Get-WmiObject](https://docs.microsoft.com/powershell/module/microsoft.powershell.management/get-wmiobject)
 
-	.NOTES
-	This function requires appropriate permissions as it uses WMI.
-	Some security software may block WMI queries.
-
-	.LINK
-	Get-Process
-	Get-WmiObject
- #>
+#>
 function global:Get-ParentProcessId {
 	param (
 		[Parameter(Mandatory = $true,
