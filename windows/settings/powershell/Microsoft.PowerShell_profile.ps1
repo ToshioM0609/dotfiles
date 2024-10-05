@@ -77,8 +77,6 @@ function private:Set-WorkingDir() {
   if ($cur -eq $env:USERPROFILE) {
     cd $USERPROFILE+"/workspaces"
   }
-
-
 }
 
 

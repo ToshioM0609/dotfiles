@@ -70,7 +70,11 @@ function Execute_History() {
 	param(
 		[switch]$send
 	)
-	$command = (Get-Content -Path (Get-PSReadLineOption).HistorySavePath -Tail 20) | tac | fzf --select-1 
+	$history = ((Get-Content -Path (Get-PSReadLineOption).HistorySavePath -Tail 20) | 
+	                     Where-Object { $_ -ne "" } |  
+											 Select-Object -Unique )
+	
+	$command = ($history) | tac | fzf --select-1 
 	if ($?) {
 		Execute_Command $command -send:$send
 	}

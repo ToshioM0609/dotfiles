@@ -66,7 +66,7 @@ function keyconfig_wzlike() {
   # history
   $keyconfig = @{
     BriefDescription = 'select & execute history'
-    LongDescription  = 'select history with peco & execute this'
+    LongDescription  = 'select history with fzf & execute this'
     ScriptBlock      = { Execute_History -send }
   }
 
