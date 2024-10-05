@@ -1,16 +1,16 @@
 <#
-	.SYNOPSIS
-	command line editing functions library
+.SYNOPSIS
+command line editing functions library
 
-	.DESCRIPTION
-    command line function library for powershell.
+.DESCRIPTION
+ command line function library for powershell.
 
-	.NOTES
-	@Author		Furukawa, Atsushi <atsushifx@aglabo.com>
-	@License 	MIT License https://opensource.org/licenses/MIT
+.NOTES
+@Author		Furukawa, Atsushi <atsushifx@aglabo.com>
+@License 	MIT License https://opensource.org/licenses/MIT
 
-	@date		2023-05-31
-	@Version 	1.1.0
+@date		2023-05-31
+@Version 	1.1.0
 
 THIS CODE IS MADE AVAILABLE AS IS, WITHOUT WARRANTY OF ANY KIND.
 THE ENTIRE RISK OF THE USE OR THE RESULTS FROM THE USE OF THIS CODE REMAINS WITH THE USER.
@@ -25,10 +25,10 @@ Retrieves the global command history from the PowerShell history file.
 Read PSReadLine''s command history files as global history. and remove clear line and duplicate entries
 
 .PARAMETER none
-	 This function does not take any parameters.
+This function does not take any parameters.
 
 .NOTES
-    The function uses PSReadLine to access the persistent command history file.
+The function uses PSReadLine to access the persistent command history file.
 #>
 function global:Get-Global-History() {
  param(
@@ -59,33 +59,37 @@ Set-Alias -Name ggh -Value global:Get-Global-History -Description { "get global 
 
 
 <#
-	.SYNOPSIS
-	execute command
+.SYNOPSIS
+execute command
 
-	.DESCRIPTION
-	execute command wrapper for history
-	if -send (equal call from command line editing)
-	emulate edit command line for execute command
+.DESCRIPTION
+execute command wrapper for history
+if -send (equal call from command line editing)
+emulate edit command line for execute command
 
-	.PARAMETER command
+.PARAMETER command
 
-	.PARAMETER send
+.PARAMETER send
 
-	.NOTES
+.PARAMETER Enter
+
+.NOTES
 
 #>
-function Execute_Command() {
+function global:Execute_Command() {
 	param(
 		[Parameter(Mandatory)][string]$command,
-		[Switch]$send
+		[Switch]$Send,
+		[Switch]$Enter
 	)
 
 	if ($send) {
 		# execute command with readline function
 		[Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
-		[Microsoft.PowerShell.PSConsoleReadLine]::InvokePrompt()
 		[Microsoft.PowerShell.PSConsoleReadLine]::Insert($command)
-		if ($?) {
+	[Microsoft.PowerShell.PSConsoleReadLine]::InvokePrompt()
+		
+		if ($Enter) {
 			[Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
 		}
 	}
@@ -116,7 +120,7 @@ function Execute_History() {
 	if ($?) {
 		Execute_Command $command -send:$send
 	}
- else {
+	else {
 		[Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
 	}
 }

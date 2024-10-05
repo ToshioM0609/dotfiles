@@ -42,14 +42,14 @@ function keyconfig_wzlike() {
   Set-PSReadLineKeyHandler -chord Ctrl+C -function copy
 
   # exit shell
-  $keyconfig = @{
+  $keyconfig_exit= @{
     BriefDescription = 'exit'
     LongDescription  = 'input exit {ENTER}'
     ScriptBlock      = {
-      Execute_Command "exit" -send
+      Execute_Command "exit" -send -enter
     }
   }
-  Set-PSReadLineKeyHandler -chord Ctrl+Z @keyconfig
+  Set-PSReadLineKeyHandler -chord Ctrl+Z @keyconfig_exit
 
   # Wz/Vz like +alpha
   Set-PSReadLineKeyHandler -chord Ctrl+a -function ShellBackwardWord
