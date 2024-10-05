@@ -32,20 +32,28 @@ Read PSReadLine''s command history files as global history. and remove clear lin
 #>
 function global:Get-Global-History() {
  param(
-
+		[int]$Head,
+		[int]$Tail
  )
 	## main routin
 	begin {
-		$globalHistoryCommand = (Get-Content -Path (Get-PSReadLineOption).HistorySavePath) 
+		$globalHistoryCommand = '(Get-Content -Path (Get-PSReadLineOption).HistorySavePath)'
 	}
 	process {
-			$history = ($globalHistoryCommand)
+		$globalHistoryAll = (Invoke-Expression $globalHistoryCommand)
 	}
 
 	end {
-		($history) |
-		Where-Object { $_ -ne "" } |
-		Select-Object -Unique
+		$history = ($globalHistoryAll)	| Where-Object { $_ -ne "" } |		Select-Object -Unique
+		
+		## Par
+		if ($Head -gt 0) {
+			$history = $history | Select-Object	-First $Head
+		}
+		if ($Tail -gt 0) {
+			$history = $history | Select-Object -Last $Tail
+		}
+		$history
 	}
 }
 Set-Alias -Name ggh -Value global:Get-Global-History -Description { "get global history from PSReadLine" }
