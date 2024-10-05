@@ -10,12 +10,46 @@
 	@License 	MIT License https://opensource.org/licenses/MIT
 
 	@date		2023-05-31
-	@Version 	1.0.0
+	@Version 	1.1.0
 
 THIS CODE IS MADE AVAILABLE AS IS, WITHOUT WARRANTY OF ANY KIND.
 THE ENTIRE RISK OF THE USE OR THE RESULTS FROM THE USE OF THIS CODE REMAINS WITH THE USER.
 #>
 Set-StrictMode -version latest
+
+<#
+.SYNOPSIS
+Retrieves the global command history from the PowerShell history file.
+
+.DESCRIPTION
+Read PSReadLine''s command history files as global history. and remove clear line and duplicate entries
+
+.PARAMETER none
+	 This function does not take any parameters.
+
+.NOTES
+    The function uses PSReadLine to access the persistent command history file.
+#>
+function global:Get-Global-History() {
+ param(
+
+ )
+	## main routin
+	begin {
+		$globalHistoryCommand = (Get-Content -Path (Get-PSReadLineOption).HistorySavePath) 
+	}
+	process {
+			$history = ($globalHistoryCommand)
+	}
+
+	end {
+		($history) |
+		Where-Object { $_ -ne "" } |
+		Select-Object -Unique
+	}
+}
+Set-Alias -Name ggh -Value global:Get-Global-History -Description { "get global history from PSReadLine" }
+
 
 <#
 	.SYNOPSIS
@@ -71,8 +105,8 @@ function Execute_History() {
 		[switch]$send
 	)
 	$history = ((Get-Content -Path (Get-PSReadLineOption).HistorySavePath -Tail 20) | 
-	                     Where-Object { $_ -ne "" } |  
-											 Select-Object -Unique )
+		Where-Object { $_ -ne "" } |  
+		Select-Object -Unique )
 	
 	$command = ($history) | tac | fzf --select-1 
 	if ($?) {
