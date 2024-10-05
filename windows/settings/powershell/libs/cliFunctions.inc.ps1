@@ -70,13 +70,12 @@ function Execute_History() {
 	param(
 		[switch]$send
 	)
-	$history = (Get-Content -Path (Get-PSReadLineOption).HistorySavePath -Tail 20)
-	$command = ($history) | tac | peco --select-1 --on-cancel error
+	$command = (Get-Content -Path (Get-PSReadLineOption).HistorySavePath -Tail 20) | tac | fzf --select-1 
 	if ($?) {
 		Execute_Command $command -send:$send
 	}
  else {
-		[PSConsoleHostReadLine]::AcceptLine()
+		[Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
 	}
 }
 
