@@ -46,7 +46,6 @@ function global:Get-Global-History() {
 	end {
 		$history = ($globalHistoryAll)	| Where-Object { $_ -ne "" } |		Select-Object -Unique
 		
-		## Par
 		if ($Head -gt 0) {
 			$history = $history | Select-Object	-First $Head
 		}
@@ -112,11 +111,8 @@ function Execute_History() {
 	param(
 		[switch]$send
 	)
-	$history = ((Get-Content -Path (Get-PSReadLineOption).HistorySavePath -Tail 20) | 
-		Where-Object { $_ -ne "" } |  
-		Select-Object -Unique )
 	
-	$command = ($history) | tac | fzf --select-1 
+	$command = (global:Get-Global-History -Tail 20) | tac | fzf --select-1 
 	if ($?) {
 		Execute_Command $command -send:$send
 	}
